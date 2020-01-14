@@ -245,7 +245,7 @@ all =
                 init
                     |> Application.subscriptions
                     |> Common.contains (Subscription.OnClockTick FiveSeconds)
-        , test "autorefreshes resource and versions every 5 seconds" <|
+        , test "autorefreshes resource and versions every five seconds" <|
             \_ ->
                 init
                     |> Application.update
@@ -2776,7 +2776,49 @@ all =
                         |> Query.findAll pinButtonSelector
                         |> Query.count (Expect.equal 1)
             ]
-        , describe "check bar" <|
+        , describe "pin tools" <|
+            [ test "has grey background" <|
+                \_ ->
+                    init
+                        |> givenResourcePinnedDynamically
+                        |> queryView
+                        |> Query.find [ id "pin-tools" ]
+                        |> Query.has [ style "background-color" "#232121" ]
+            , test "has height of 28 px" <|
+                \_ ->
+                    init
+                        |> givenResourcePinnedDynamically
+                        |> queryView
+                        |> Query.find [ id "pin-tools" ]
+                        |> Query.has [ style "height" "28px" ]
+            , test "not display check status bar when resources being pinned" <|
+                \_ ->
+                    init
+                        |> givenResourcePinnedDynamically
+                        |> queryView
+                        |> Query.hasNot [ class "resource-check-status" ]
+            , test "only appears when the resource is pinned" <|
+                \_ ->
+                    init
+                        |> givenResourceIsNotPinned
+                        |> queryView
+                        |> Query.hasNot [ id "pin-tools" ]
+            , test "has a bottom margin of 24 px" <|
+                \_ ->
+                    init
+                        |> givenResourcePinnedDynamically
+                        |> queryView
+                        |> Query.find [ id "pin-tools" ]
+                        |> Query.has [ style "margin-bottom" "24px" ]
+            , test "shows a pinned version" <|
+                \_ ->
+                    init
+                        |> givenResourcePinnedDynamically
+                        |> queryView
+                        |> Query.find [ id "pin-tools" ]
+                        |> Query.has [ text version ]
+            ]
+        , describe "check status" <|
             let
                 checkBar userState =
                     let

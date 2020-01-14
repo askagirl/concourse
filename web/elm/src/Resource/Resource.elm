@@ -910,9 +910,14 @@ body session model =
     in
     Html.div
         (id "body" :: Resource.Styles.body)
-        [ checkSection sectionModel
-        , viewVersionedResources session model
-        ]
+    <|
+        (if model.pinnedVersion == NotPinned then
+            [ checkSection sectionModel ]
+
+         else
+            [ pinTools model.pinnedVersion ]
+        )
+            ++ [ viewVersionedResources session model ]
 
 
 paginationMenu :
@@ -1025,6 +1030,35 @@ paginationMenu { hovered } model =
                         )
                         []
                     ]
+        ]
+
+
+pinTools : Models.PinnedVersion -> Html Message
+pinTools pinnedVersion =
+    Html.div
+        [ id "pin-tools"
+        , style "background-color" "#232121"
+        , style "height" "28px"
+        , style "margin-bottom" "24px"
+        ]
+        [ case pinnedVersion of
+            NotPinned ->
+                Html.text ""
+
+            PinningTo _ ->
+                Html.text ""
+
+            PinnedDynamicallyTo _ version ->
+                viewVersion [] version
+
+            UnpinningFrom _ version ->
+                viewVersion [] version
+
+            PinnedStaticallyTo version ->
+                viewVersion [] version
+
+            Switching _ version _ ->
+                viewVersion [] version
         ]
 
 
